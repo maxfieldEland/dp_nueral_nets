@@ -16,7 +16,7 @@ We use the open source MNIST Data set which can be found at : http://yann.lecun.
 - but the noisy labels are very bad and not recoverable on their own
 - use unsupervised clustering on the examples (ignoring labels)
 - hopefully these form good clusters
-- then look at all of the noisy labels within each cluster, and determine the most likely label for that cluster (we as thinking htat this will be very evident because each cluster should have a LOT of examples in it, so averaging is on our side)
+- then look at all of the noisy labels within each cluster, and determine the most likely label for that cluster (we are thinking that this will be very evident because each cluster should have a LOT of examples in it, so averaging is on our side)
 - Then we label the clusters, and we have a differentially private model to take an image and classify it
 - look at performance
 
