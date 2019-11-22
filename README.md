@@ -7,8 +7,8 @@ derived by unary encoding. Contributors include : Sophia, Nick and Max.
 We use the open source MNIST Data set which can be found at : http://yann.lecun.com/exdb/mnist/
 
 
-# models
-## unary encoding with clustering
+# Possible Approaches
+## Unary Encoding with Clustering
 - convert each pixel to binary: either on or off
 - convert each label to one hot representation
 - use unary encoding on each example to get local synthetic dataset
@@ -20,7 +20,7 @@ We use the open source MNIST Data set which can be found at : http://yann.lecun.
 - Then we label the clusters, and we have a differentially private model to take an image and classify it
 - look at performance
 
-## marginals and convolution neural net
+## Marginals and Convolutional Neural Net
 - build 2-way marginals between each pixel and the label
 - build 1-way marginal for the label
 - build synthetic dataset by drawing a label from the 1-way marginal, then draw a pixel value from each 2-way marginal, given that label
