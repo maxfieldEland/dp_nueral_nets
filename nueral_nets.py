@@ -6,31 +6,27 @@ Created on Sun Nov 24 10:07:31 2019
 @author: max
 
 Nueral Net Architectures
-
 Generate several CNN architectures that vary in layer depth
-
 CNNs will be trained on reclassified binary encoded MNIST data set
-
 """
 
 import numpy as np 
 import keras 
-from keras.datasets import mnist 
 from keras.models import Model 
 from keras.layers import Dense, Input
 from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten 
 from keras import backend as k 
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data() 
+# load in noised testing and training data
+x_train = np.load('data/train_images.npy')
+x_test = np.load('data/test_images.npy')
+y_train = np.load('data/train_labels.npy')
+y_test = np.load('data/test_labels.npy')
+
 
 img_rows, img_cols=28, 28
 
-if k.image_data_format() == 'channels_first': 
-x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols) 
-x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols) 
-inpx = (1, img_rows, img_cols) 
 
-else: 
 x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1) 
 x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1) 
 inpx = (img_rows, img_cols, 1) 
