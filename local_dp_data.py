@@ -58,6 +58,13 @@ def perturb_labels(labels, p, q):
     
 train_images, train_labels, test_images, test_labels = load_mnist()
 
+np.save('data/train_images.npy', train_images)
+np.save('data/test_images.npy', test_images)
+np.save('data/train_labels.npy', train_labels)
+np.save('data/test_labels.npy', test_labels)
+
+
+
 
 # todo: make figures of possible cutoffs for writeup. or maybe not
 # because looking at these is not DP?
@@ -70,7 +77,7 @@ if show_cutoff_plots:
 # around 115 looks good, so let's use that
 binary_train = train_images > 115
 
-# look at different values of p and q. Assume q = 1-p. Could change this? look into literature
+# look at different values of p and q. Assume q = 1-p. Could change this? look into literature 
 show_p_q_plots = False
 if show_p_q_plots:
     ps_and_qs = [(p, 1-p) for p in np.linspace(0.501, 0.999, 10)]
@@ -83,6 +90,10 @@ q = 0.12
 
 local_train_images = perturb_examples(binary_train, p, q)
 local_train_labels = perturb_labels(train_labels, p, q)
+
+# save perturbed data to data foulder
+np.save('data/local_train_images.npy', local_train_images)
+np.save('data/local_train_labels.npy', local_train_labels)
 
 
 
