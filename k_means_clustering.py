@@ -9,29 +9,46 @@ Reclassify unary encoded pixel sets as NMIST digits based on majority count.
 
 """
 
+
 from sklearn.cluster import KMeans  
 from sklearn.metrics import jaccard_score
+from sklearn.preprocessing import OneHotEncoder
 import numpy as np
-
 
 # for now, load regular MNIST Data set
 
-def main(train_im_path, test_im_path, t_lab_path, test_lab_path:
-    train_images = np.load('data/train_images.npy')
-    test_images = np.load('data/test_images.npy')
-    train_labels = np.load('data/train_labels.npy')
-    test_labels = np.load('data/test_labels.npy')
-    
-    images = np.concatenate((train_images,test_images),axis = 0)
-    image_reshape = images.reshape(70000,28*28)
-    labels =  np.concatenate((train_labels,test_labels),axis = 0)
-    
+def main(images,labels):
+   
     # train on entire data set and classify all 
     km = KMeans(n_clusters = 10)
+    #reshape images
+    images = images.reshape((120000,28*28))
     
-    y_km = km.fit_predict(image_reshape)
+    y_km = km.fit_predict(images)
     
-    j_score = jaccard_score(labels, y_km, average = None)
+    y_km_train = y_km[:60000]
+    y_km_test = y_km[60000:]
+    return(y_km_train, y_km_test)
+
+def main_report_acc(images,labels):
+   
+    # train on entire data set and classify all 
+    km = KMeans(n_clusters = 10)
+    #reshape images
+    images = images.reshape((120000,28*28))
     
-    print('jaccard score = ' , jaccard_score)
-    return(y_km)
+    y_km = km.fit_predict(images)
+    
+    # one hot encode integer labels labels
+    onehot_encoder = OneHotEncoder(sparse=False)
+    integer_encoded = y_km.reshape(len(y_km), 1)
+    onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
+    
+    # report jaccard score for each class of labels
+    j_score = jaccard_score(labels, onehot_encoded, average = None)
+    print('jaccard score = ' , j_score)
+    
+    y_km_train = onehot_encoded[:60000]
+    y_km_test = onehot_encoded[60000:]
+    return(y_km_train, y_km_test)
+

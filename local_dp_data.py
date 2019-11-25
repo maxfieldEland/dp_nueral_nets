@@ -44,7 +44,7 @@ def visualize_eps(examples, p, q):
 
 
 def perturb_examples(examples, p, q):
-    return [perturb_example(ex, p, q) for ex in binary_train[:12]]
+    return [perturb_example(ex, p, q) for ex in binary_train]
 
 def perturb_label(label, p, q):
     domain  = np.arange(0, 10)
@@ -58,10 +58,10 @@ def perturb_labels(labels, p, q):
     
 train_images, train_labels, test_images, test_labels = load_mnist()
 
-np.save('data/train_images.npy', train_images)
-np.save('data/test_images.npy', test_images)
-np.save('data/train_labels.npy', train_labels)
-np.save('data/test_labels.npy', test_labels)
+#np.save('data/train_images.npy', train_images)
+#np.save('data/test_images.npy', test_images)
+#np.save('data/train_labels.npy', train_labels)
+#np.save('data/test_labels.npy', test_labels)
 
 
 
@@ -91,7 +91,7 @@ q = 0.12
 local_train_images = perturb_examples(binary_train, p, q)
 local_train_labels = perturb_labels(train_labels, p, q)
 
-# save perturbed data to data foulder
+# save perturbed data to data folder
 np.save('data/local_train_images.npy', local_train_images)
 np.save('data/local_train_labels.npy', local_train_labels)
 
