@@ -48,5 +48,7 @@ clustered_labels_train, clustered_labels_test = kmeans.main(images,labels)
 # training nueral network on reclustered data
 x_train,x_test,y_train, y_test = nn.format_data(local_train_images, local_test_images,clustered_labels_train, clustered_labels_test)
 
+
+
 # simple model is a 2d cnn, can be switched out with any architecture 
 best_model = nn.run_model(nn.simple_model,x_train,y_train,x_test,y_test)
