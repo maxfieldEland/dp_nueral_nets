@@ -55,6 +55,46 @@ def perturb_labels(labels, p, q):
     return np.array([perturb_label(l, p, q) for l in labels])
 
 
+def gaussian_mech_vec(v, sensitivity, epsilon, delta):
+    return v + np.random.normal(loc=0, scale=sensitivity * np.sqrt(2*np.log(1.25/delta)) / epsilon, size=len(v))
+
+def gaussian_example(example, epsilon=1, delta=1/((28*28)**2)): # 1/n^2
+    dims = example.shape
+
+    # normalize x so it has a norm of 1
+    x = example.reshape(-1)
+    x = x / np.linalg.norm(x)
+    # print(np.linalg.norm(x, ord=2))
+    x = gaussian_mech_vec(x, 1, epsilon, delta)
+    x = np.clip(x, 0, None)
+    return x.reshape(dims)
+
+def rr(pixel, cutoff, p, q):
+    # if np.random.rand() < 0.5:
+        # return pixel > cutoff
+    # else:
+        # if np.random.rand() < 0.5:
+            # return True
+        # else:
+            # return False
+    if pixel > cutoff:
+        return np.random.rand() < p
+    else:
+        return np.random.rand() < q
+            
+
+def ue_eps(p, q):
+    return np.log((p*(1-q)) / (q*(1-p)))
+
+def rr_ex(example, p, q):
+    dims = example.shape
+    xs = example.reshape(-1)
+    xs_rr = np.array([rr(x, 115, p, q) for x in xs])
+    epsilon = ue_eps(p, q)
+    print(f"Epsilon={epsilon}")
+    return xs_rr.reshape(dims)
+    
+
     
 train_images, train_labels, test_images, test_labels = load_mnist()
 
@@ -75,7 +115,7 @@ if show_cutoff_plots:
     visualize_cutoff(train_images[:12], possible_cutoffs)
 
 # around 115 looks good, so let's use that
-binary_train = train_images > 115
+binary_train = train_images > 0
 
 # look at different values of p and q. Assume q = 1-p. Could change this? look into literature 
 show_p_q_plots = False
