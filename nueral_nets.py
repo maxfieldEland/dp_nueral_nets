@@ -70,7 +70,7 @@ def simple_model(dense_layer_sizes, filters, kernel_size, pool_size):
     model = Sequential()
     model.add(Conv2D(filters, kernel_size,
                      padding='valid',
-                     input_shape=(28,28)))
+                     input_shape=(28,28,1)))
     model.add(Activation('relu'))
     model.add(Conv2D(filters, kernel_size))
     model.add(Activation('relu'))
@@ -92,6 +92,7 @@ def simple_model(dense_layer_sizes, filters, kernel_size, pool_size):
 
 
 def run_model(model_architecture,x_train,y_train,x_test,y_test):
+    
     
     # use grid search cross validation on desired model
     
