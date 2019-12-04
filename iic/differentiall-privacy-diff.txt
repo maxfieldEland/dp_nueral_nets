@@ -1,0 +1,78 @@
+[1mdiff --git a/data.py b/data.py[m
+[1mindex 3d485aa..b3c5654 100644[m
+[1m--- a/data.py[m
+[1m+++ b/data.py[m
+[36m@@ -3,10 +3,36 @@[m [mimport tensorflow as tf[m
+ import tensorflow_datasets as tfds[m
+ [m
+ [m
+[32m+[m[32mdef noise_x(x_orig, debug=False):[m
+[32m+[m[32m    # 150, 3000, 5000, 200000[m
+[32m+[m[32m    # take 2: 3000 doesn't??? initializations matter a lot??[m
+[32m+[m[32m    epsilon = 3000 # 5000 works, 300 doesnt, 1000,2000,2500,2750, 2900 doesnt, 3000 does both fall into 0.693 hole (picking majority class)[m
+[32m+[m[32m    delta = 1/((28*28)**2)[m
+[32m+[m[32m    sensitivity = 1[m
+[32m+[m[32m    scale = sensitivity * np.sqrt(2*np.log(1.25/delta)) / epsilon[m
+[32m+[m
+[32m+[m[32m    # cast to float[m
+[32m+[m[32m    x_orig = tf.cast(x_orig, dtype=tf.float32)[m
+[32m+[m
+[32m+[m[32m    # normalize[m
+[32m+[m[32m    x_orig = tf.math.l2_normalize(x_orig)[m
+[32m+[m
+[32m+[m[32m    # add noise[m
+[32m+[m[32m    x_orig = tf.math.add(x_orig, tf.random.normal(tf.shape(x_orig), mean=0, stddev=scale))[m
+[32m+[m
+[32m+[m[32m    # clip to get rid of negatives (need to specify some upper bound)[m
+[32m+[m[32m    x_orig = tf.clip_by_value(x_orig, 0, 100000)[m
+[32m+[m
+[32m+[m[32m    # odd parameter we need to add to get model to work.[m
+[32m+[m[32m    # Base model takes pixel values and divides by 255, and we're normalizing so our individual values are much smaller[m
+[32m+[m[32m    # I think this is just effectively changing the learning rate, but couldn't get that to work, and this does.[m
+[32m+[m[32m    # 100 is too small, 255 works well, 500 works well[m
+[32m+[m[32m    x_orig = tf.math.scalar_mul(250, x_orig)[m
+[32m+[m
+[32m+[m[32m    return x_orig[m
+[32m+[m
+ def mnist_x(x_orig, mdl_input_dims, is_training):[m
+ [m
+[31m-    # rescale to [0, 1][m
+[31m-    x_orig = tf.cast(x_orig, dtype=tf.float32) / x_orig.dtype.max[m
+ [m
+     # get common shapes[m
+     height_width = mdl_input_dims[:-1][m
+[36m@@ -36,8 +62,6 @@[m [mdef mnist_gx(x_orig, mdl_input_dims, is_training, sample_repeats):[m
+     if not is_training:[m
+         return tf.zeros([0] + mdl_input_dims)[m
+ [m
+[31m-    # rescale to [0, 1][m
+[31m-    x_orig = tf.cast(x_orig, dtype=tf.float32) / x_orig.dtype.max[m
+ [m
+     # repeat samples accordingly[m
+     x_orig = tf.tile(x_orig, [sample_repeats] + [1] * len(x_orig.shape.as_list()[1:]))[m
+[36m@@ -88,10 +112,10 @@[m [mdef pre_process_data(ds, info, is_training, **kwargs):[m
+     """[m
+     # apply pre-processing function for given data set and run-time conditions[m
+     if info.name == 'mnist':[m
+[31m-        return ds.map(lambda d: {'x': mnist_x(d['image'],[m
+[32m+[m[32m        return ds.map(lambda d: {'x': mnist_x(noise_x(d['image']),[m
+                                               mdl_input_dims=kwargs['mdl_input_dims'],[m
+                                               is_training=is_training),[m
+[31m-                                 'gx': mnist_gx(d['image'],[m
+[32m+[m[32m                                 'gx': mnist_gx(noise_x(d['image']),[m
+                                                 mdl_input_dims=kwargs['mdl_input_dims'],[m
+                                                 is_training=is_training,[m
+                                                 sample_repeats=kwargs['num_repeats']),[m
+[1mdiff --git a/models_iic.py b/models_iic.py[m
+[1mindex 3841913..a083687 100644[m
+[1m--- a/models_iic.py[m
+[1m+++ b/models_iic.py[m
+[36m@@ -400,7 +400,7 @@[m [mif __name__ == '__main__':[m
+     mdl = ClusterIIC(**MDL_CONFIG[DATA_SET])[m
+ [m
+     # train the model[m
+[31m-    mdl.train(IICGraph(config='B', batch_norm=True, fan_out_init=64), TRAIN_SET, TEST_SET, num_epochs=600)[m
+[32m+[m[32m    mdl.train(IICGraph(config='B', batch_norm=True, fan_out_init=64), TRAIN_SET, TEST_SET, num_epochs=40)[m
+ [m
+     print('All done!')[m
+     plt.show()[m
