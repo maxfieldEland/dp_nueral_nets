@@ -1,0 +1,78 @@
+diff --git a/data.py b/data.py
+index 3d485aa..b3c5654 100644
+--- a/data.py
++++ b/data.py
+@@ -3,10 +3,36 @@ import tensorflow as tf
+ import tensorflow_datasets as tfds
+ 
+ 
++def noise_x(x_orig, debug=False):
++    # 150, 3000, 5000, 200000
++    # take 2: 3000 doesn't??? initializations matter a lot??
++    epsilon = 3000 # 5000 works, 300 doesnt, 1000,2000,2500,2750, 2900 doesnt, 3000 does both fall into 0.693 hole (picking majority class)
++    delta = 1/((28*28)**2)
++    sensitivity = 1
++    scale = sensitivity * np.sqrt(2*np.log(1.25/delta)) / epsilon
++
++    # cast to float
++    x_orig = tf.cast(x_orig, dtype=tf.float32)
++
++    # normalize
++    x_orig = tf.math.l2_normalize(x_orig)
++
++    # add noise
++    x_orig = tf.math.add(x_orig, tf.random.normal(tf.shape(x_orig), mean=0, stddev=scale))
++
++    # clip to get rid of negatives (need to specify some upper bound)
++    x_orig = tf.clip_by_value(x_orig, 0, 100000)
++
++    # odd parameter we need to add to get model to work.
++    # Base model takes pixel values and divides by 255, and we're normalizing so our individual values are much smaller
++    # I think this is just effectively changing the learning rate, but couldn't get that to work, and this does.
++    # 100 is too small, 255 works well, 500 works well
++    x_orig = tf.math.scalar_mul(250, x_orig)
++
++    return x_orig
++
+ def mnist_x(x_orig, mdl_input_dims, is_training):
+ 
+-    # rescale to [0, 1]
+-    x_orig = tf.cast(x_orig, dtype=tf.float32) / x_orig.dtype.max
+ 
+     # get common shapes
+     height_width = mdl_input_dims[:-1]
+@@ -36,8 +62,6 @@ def mnist_gx(x_orig, mdl_input_dims, is_training, sample_repeats):
+     if not is_training:
+         return tf.zeros([0] + mdl_input_dims)
+ 
+-    # rescale to [0, 1]
+-    x_orig = tf.cast(x_orig, dtype=tf.float32) / x_orig.dtype.max
+ 
+     # repeat samples accordingly
+     x_orig = tf.tile(x_orig, [sample_repeats] + [1] * len(x_orig.shape.as_list()[1:]))
+@@ -88,10 +112,10 @@ def pre_process_data(ds, info, is_training, **kwargs):
+     """
+     # apply pre-processing function for given data set and run-time conditions
+     if info.name == 'mnist':
+-        return ds.map(lambda d: {'x': mnist_x(d['image'],
++        return ds.map(lambda d: {'x': mnist_x(noise_x(d['image']),
+                                               mdl_input_dims=kwargs['mdl_input_dims'],
+                                               is_training=is_training),
+-                                 'gx': mnist_gx(d['image'],
++                                 'gx': mnist_gx(noise_x(d['image']),
+                                                 mdl_input_dims=kwargs['mdl_input_dims'],
+                                                 is_training=is_training,
+                                                 sample_repeats=kwargs['num_repeats']),
+diff --git a/models_iic.py b/models_iic.py
+index 3841913..a083687 100644
+--- a/models_iic.py
++++ b/models_iic.py
+@@ -400,7 +400,7 @@ if __name__ == '__main__':
+     mdl = ClusterIIC(**MDL_CONFIG[DATA_SET])
+ 
+     # train the model
+-    mdl.train(IICGraph(config='B', batch_norm=True, fan_out_init=64), TRAIN_SET, TEST_SET, num_epochs=600)
++    mdl.train(IICGraph(config='B', batch_norm=True, fan_out_init=64), TRAIN_SET, TEST_SET, num_epochs=40)
+ 
+     print('All done!')
+     plt.show()
