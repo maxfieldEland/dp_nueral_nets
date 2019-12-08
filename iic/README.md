@@ -1,3 +1,5 @@
+# Originally from https://github.com/astirn/IIC
+
 # IIC
 My TensorFlow Implementation of https://arxiv.org/abs/1807.06653
 
