@@ -1,5 +1,5 @@
 # dp_nueral_nets
-Repository for Data Privacy Final Project. Investigates the performance of unsupervised clustering methods used to classify unlabeled, differentially-private MNIST data. Contributors: Sophia Hodson, Nick Hanoian and Max Green. 
+Repository for Data Privacy Final Project. December 2019. Investigates the performance of unsupervised clustering methods used to classify unlabeled, differentially-private MNIST data. Contributors: Sophia Hodson, Nick Hanoian and Max Green. 
 
 
 We use the open source MNIST Data set which can be found at : http://yann.lecun.com/exdb/mnist/
