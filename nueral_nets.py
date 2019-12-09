@@ -47,9 +47,6 @@ def format_data(x_train, x_test,y_train_in,y_test_in):
     x_train /= 255
     x_test /= 255
     
-    y_train_in = keras.utils.to_categorical(y_train_in, num_classes)
-    y_test_in = keras.utils.to_categorical(y_test_in, num_classes)
-
     return(x_train,x_test, y_train_in, y_test_in)
 
 

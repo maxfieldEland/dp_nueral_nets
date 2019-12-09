@@ -15,7 +15,7 @@ from mnist_utils import load_mnist
 import k_means_clustering as kmeans
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
-
+import keras
 # load in mnist data set
 train_images=np.load('data/train_images.npy')
 train_labels=np.load('data/train_labels.npy')
@@ -30,15 +30,16 @@ binary_train = train_images > 115
 # set probability of bit flip
 
 
-eps = 200000
+eps = 1925 # preserving total epsilon of 2000
+
 local_train_image = np.array(dp.gaussian_examples(train_images,eps,1/((28*28)**2)))
 local_test_image = np.array(dp.gaussian_examples(test_images,eps,1/((28*28)**2)))
 
-q = 0.0000000000000001
+q = 0.00000000000000001
 p = 1-q
 
-# calculate eps cost
-e = dp.ue_eps(p,q)
+# calculate eps cost( roughyl 75)
+e = dp.ue_eps(p,q) + eps
 e
 local_train_label = dp.perturb_labels(train_labels,p,q)
 local_test_label = dp.perturb_labels(test_labels,p,q)
@@ -72,6 +73,10 @@ for idx,model in enumerate(models):
     
 
 
+
+
+
+
 # train on reclustered data
 # ----------------------------------------- Recluster noised data ----------------------------------
 
@@ -81,11 +86,6 @@ local_labels = np.concatenate((local_train_label,local_test_label))
 
 images = np.concatenate((local_train_image,local_test_image))
 labels = np.concatenate((train_labels,test_labels))
-
-# perform k-means clustering with k = 10
-clustered_train,clustered_test = kmeans.main(images, labels)
-
-clustered_train,clustered_test = kmeans.main(images, labels)
 
 
 
@@ -130,15 +130,16 @@ for i in range(cm.shape[0]):
 
 # training nueral network on reclustered data
 
-models = [nn.medium_model]
-x_train,x_test,y_train, y_test = nn.format_data(local_train_image, local_test_image,train_labels, test_labels)
+x_train,x_test,y_train, y_test = nn.format_data(local_train_image, local_test_image,clustered_local_labels_train, clustered_local_labels_test)
+y_train = keras.utils.to_categorical(y_train, 10)
+y_test = keras.utils.to_categorical(y_test, 10)
 
 for idx,model in enumerate(models):
 
     score, history = nn.run_model(epochs,model,x_train,y_train,x_test,y_test)
     val_acc = history['val_accuracy']
     acc = history['accuracy']
-    
+    e = 1925
     #make plots
     fig = plt.figure(figsize = (8,8))
     plt.plot(list(range(epochs)),val_acc,color ='red',label = 'Validation Accuracy')
@@ -146,10 +147,6 @@ for idx,model in enumerate(models):
     plt.legend()
     plt.xlabel("epochs")
     plt.ylabel("accuracy")
-    if idx == 0:
-        plt.title("Small Model Accuracy with Epsilon = " + str(e) + 'and Reclustered Labels')
-    if idx == 1:
-        plt.title("Meduim Model Accuracy with Epsilon = " + str(e)+'and Reclustered Labels')
     
 
 
