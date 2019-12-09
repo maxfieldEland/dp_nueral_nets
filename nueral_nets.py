@@ -12,7 +12,7 @@ from __future__ import print_function
 import keras
 from keras.datasets import mnist
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Dense, Dropout, Activation, Flatten, BatchNormalization
 from keras.layers import Conv2D, MaxPooling2D
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras import backend as K
@@ -31,7 +31,7 @@ img_rows, img_cols = 28, 28
 
 
 
-def format_data(x_train, x_test,y_train,y_test):
+def format_data(x_train, x_test,y_train_in,y_test_in):
     
     if K.image_data_format() == 'channels_first':
         x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
@@ -47,10 +47,10 @@ def format_data(x_train, x_test,y_train,y_test):
     x_train /= 255
     x_test /= 255
     
-    y_train = keras.utils.to_categorical(y_train, num_classes)
-    y_test = keras.utils.to_categorical(y_test, num_classes)
+    y_train_in = keras.utils.to_categorical(y_train_in, num_classes)
+    y_test_in = keras.utils.to_categorical(y_test_in, num_classes)
 
-    return(x_train,x_test, y_train, y_test)
+    return(x_train,x_test, y_train_in, y_test_in)
 
 
 
@@ -91,7 +91,7 @@ def simple_model(dense_layer_sizes, filters, kernel_size, pool_size):
     return model
 
 
-def run_model(model_architecture,x_train,y_train,x_test,y_test):
+def run_model1(model_architecture,x_train,y_train,x_test,y_test):
     
     
     # use grid search cross validation on desired model
@@ -106,9 +106,11 @@ def run_model(model_architecture,x_train,y_train,x_test,y_test):
                                          'filters': [8],
                                          'kernel_size': [3],
                                          'pool_size': [2]},
-                             scoring='neg_log_loss',
+                             scoring='accuracy',
                              n_jobs=1)
     
+    np.isnan(x_train)
+    np.isnan(y_train)
     validator.fit(x_train, y_train)
     
     print('The parameters of the best model are: ')
@@ -124,3 +126,56 @@ def run_model(model_architecture,x_train,y_train,x_test,y_test):
     return(best_model)
     
     
+def small_model():
+    model = Sequential()
+    model.add(Conv2D(32, kernel_size=(3, 3),
+                     activation='relu',
+                     input_shape=[28,28,1]))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(num_classes, activation='softmax'))
+    
+    return(model)
+def medium_model():
+    model = Sequential()
+    model.add(Conv2D(32, kernel_size=3, activation='relu',padding='same', input_shape=(28,28,1)))
+    model.add(Conv2D(32, kernel_size=3, activation='relu',padding='same'))
+    model.add(MaxPooling2D(pool_size=2,strides=2))
+    model.add(Dropout(0.25))
+    model.add(Conv2D(64, kernel_size=3, activation='relu'))
+    model.add(Conv2D(64, kernel_size=3, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=2,strides=2))
+    model.add(Dropout(0.5))
+    
+    model.add(Flatten())
+    model.add(Dense(1024, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
+    model.add(Dense(10, activation='softmax'))
+    
+    return(model)
+    
+    
+def run_model(epochs,model,x_train ,y_train, x_test,y_test):
+    
+    model = model()
+    model.compile(loss=keras.losses.categorical_crossentropy,
+                  optimizer=keras.optimizers.Adadelta(),
+                  metrics=['accuracy'])
+    
+    hist = model.fit(x_train, y_train,
+              batch_size=200,
+              epochs=epochs,
+              verbose=1,
+              validation_data=(x_test, y_test))
+    score = model.evaluate(x_test, y_test, verbose=1)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+    
+    print(hist.history)
+    return(score,hist.history)

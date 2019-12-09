@@ -69,6 +69,10 @@ def gaussian_example(example, epsilon=1, delta=1/((28*28)**2)): # 1/n^2
     x = np.clip(x, 0, None)
     return x.reshape(dims)
 
+def gaussian_examples(examples, epsilon=1, delta=1/((28*28)**2)):
+    return [gaussian_example(example, epsilon, delta) for example in examples]
+    
+    
 def rr(pixel, cutoff, p, q):
     # if np.random.rand() < 0.5:
         # return pixel > cutoff
@@ -96,7 +100,39 @@ def rr_ex(example, p, q):
     
 
     
-train_images, train_labels, test_images, test_labels = load_mnist()
+train_images=np.load('data/train_images.npy')
+train_labels=np.load('data/train_labels.npy')
+test_images=np.load('data/test_images.npy')
+test_labels = np.load('data/test_labels.npy')
+
+#x = train_images[0,:,:]
+#
+#x_local = gaussian_example(x,1,1/((28*28)**2) )
+#x_local = gaussian_example(x,150,1/((28*28)**2) )
+#eps = [10,150,500,3000,5000,200000]
+#
+#
+#
+#fig = plt.figure(figsize = (8,12))
+#for idx,ep in enumerate(eps):
+#    x_local = gaussian_example(x,ep,1/((28*28)**2))
+#    ax = fig.add_subplot(3,2,idx+1,label = "HIII")
+#    print(ep)
+#    ax.set_title('epsilon = '+str(ep))
+#    plt.imshow(x_local)
+#    plt.axis('off')
+#
+#plt.savefig("epsilons.png", bbox_inches='tight')
+#plt.show()
+#
+#x_local = gaussian_example(x,150,1/((28*28)**2) )
+#
+#
+#show_examples([gaussian_example(ex, epsilon=150) for ex in train_images[:12]])
+#
+
+
+
 
 #np.save('data/train_images.npy', train_images)
 #np.save('data/test_images.npy', test_images)
