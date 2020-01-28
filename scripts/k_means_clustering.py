@@ -15,6 +15,8 @@ from sklearn.metrics import jaccard_score
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.decomposition import PCA
 import numpy as np
+import local_dp_data as dp
+
 
 # for now, load regular MNIST Data set
 
@@ -23,7 +25,7 @@ def main(images,labels):
     # train on entire data set and classify all 
     km = KMeans(n_clusters = 10)
     #reshape images
-    images = images.reshape((120000,28*28))
+    images = images.reshape((70000,28*28))
     
     y_km = km.fit_predict(images)
     
@@ -56,18 +58,23 @@ def main_report_acc(images,labels):
 
 from sklearn.cluster import AgglomerativeClustering
 def nick_kmeans(images, labels):
-    raw_images, raw_labels, _, _ = load_mnist()
-    raw_images = raw_images[:10000] > 115
+    #raw_images, raw_labels, _, _ = load_mnist()
+    raw_images = images[:10000] > 115
+    raw_labels = labels[:10000]
     # km = AgglomerativeClustering(n_clusters=10)
     km = KMeans(n_clusters=10, n_jobs=-1)
 
     images_1d = raw_images.reshape(-1, 28*28)
     print(images_1d.dtype)
-    pca = PCA(n_components=50)
-    images_reduced = pca.fit_transform(images_1d)
-    y_pred = km.fit_predict(images_1d)
-    for i in range(10):
-        show_examples(raw_images[y_pred == i][:12], title=str(raw_labels[:10000][y_pred==i][:12]))
-
+    #pca = PCA(n_components=50)
     
+    #images_reduced = pca.fit_transform(images_1d)
+    y_pred = km.fit_predict(images_1d)
+    #for i in range(10):
+     #   dp.show_examples(raw_images[y_pred == i][:12], title=str(raw_labels[:10000][y_pred==i][:12]))
+    j_score = jaccard_score(raw_labels, y_pred, average = None)
+    print(j_score)
+    return(y_pred)
+    
+
     
