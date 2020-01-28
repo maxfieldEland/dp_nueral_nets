@@ -1,3 +1,6 @@
+# (setq python-shell-interpreter "~/python-environments/ml/bin/python")
+
+
 import numpy as np
 from mnist_utils import load_mnist
 import matplotlib.pyplot as plt
@@ -66,7 +69,7 @@ def gaussian_example(example, epsilon=1, delta=1/((28*28)**2)): # 1/n^2
     x = x / np.linalg.norm(x)
     # print(np.linalg.norm(x, ord=2))
     x = gaussian_mech_vec(x, 1, epsilon, delta)
-    x = np.clip(x, 0, None)
+    x = np.clip(x, 0, 100000)
     return x.reshape(dims)
 
 def rr(pixel, cutoff, p, q):

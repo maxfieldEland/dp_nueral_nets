@@ -1,18 +1,36 @@
-# dp_nueral_nets
+# Differentially-private neural networks through synthetic data
 Repository for Data Privacy Final Project. December 2019. Investigates the performance of unsupervised clustering methods used to classify unlabeled, differentially-private MNIST data. Contributors: Sophia Hodson, Nick Hanoian and Max Green. 
 
 
 We use the open source MNIST Data set which can be found at : http://yann.lecun.com/exdb/mnist/
 
+![Noised MNIST data](docs/paper-src/figres/epsilons.png)
+Differentially-private input data for various values of epsilon.
+
+## Project
+
+
+This project investigates how model performance of a neural network
+classifier changes when training the model on raw data versus
+synthetic data. We evaluate testing performance on raw data, as this
+is the most realistic scenario: one analyst builds a generalizable,
+differentially private neural network to classify data, and individual
+companies will use the model to classify their raw data. By asking and
+exploring this question, we can better understand the power and
+limitations of using machine learning on synthetic data.
+
 
 ## Description of Files
 
-- `mnist_utils.py`: script which loads in the MNIST dataset
-- `local_dp_data.py`: script experimenting and visualizing different differential privacy algorithms to noise the data with
+- `docs`: folder containing the resulting paper as well as slides used to present our findings.
+- `scripts`: scripts used to noise the data and create basic models
+  - `mnist_utils.py`: script which loads in the MNIST dataset
+  - `local_dp_data.py`: script experimenting and visualizing different differential privacy algorithms to noise the data with
+  - `neural_nets.py`: neural networks model
+  - `k_means_clustering.py`: definition of unsupervised kmeans clustering model 
+  - `driver.py`: driver file to run kmeans clustering algorithm
 - `iic/`: folder containing code to run IIC model with local differential privacy. Original implementation from https://github.com/astirn/IIC. Our modifications to the original implementation are contained in a diff located at `iic/dp-diff.txt`.
-- `neural_nets.py`: neural networks model
-- `k_means_clustering.py`: definition of unsupervised kmeans clustering model 
-- `driver.py`: driver file to run kmeans clustering algorithm
+
 
 
 
