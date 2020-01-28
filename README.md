@@ -4,7 +4,7 @@ Repository for Data Privacy Final Project. December 2019. Investigates the perfo
 
 We use the open source MNIST Data set which can be found at : http://yann.lecun.com/exdb/mnist/
 
-![Noised MNIST data](docs/paper-src/figres/epsilons.png)
+![Noised MNIST data](docs/paper-src/figures/epsilons.png)
 Differentially-private input data for various values of epsilon.
 
 ## Project
@@ -30,7 +30,7 @@ limitations of using machine learning on synthetic data.
   - `k_means_clustering.py`: definition of unsupervised kmeans clustering model 
   - `driver.py`: driver file to run kmeans clustering algorithm
 - `iic/`: folder containing code to run IIC model with local differential privacy. Original implementation from https://github.com/astirn/IIC. Our modifications to the original implementation are contained in a diff located at `iic/dp-diff.txt`.
-
+- `figures`: figures from the paper
 
 
 
