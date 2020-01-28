@@ -5,6 +5,7 @@ Repository for Data Privacy Final Project. December 2019. Investigates the perfo
 We use the open source MNIST Data set which can be found at : http://yann.lecun.com/exdb/mnist/
 
 ![Noised MNIST data](docs/paper-src/figures/epsilons.png)
+
 Differentially-private input data for various values of epsilon.
 
 ## Project
